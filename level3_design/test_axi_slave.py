@@ -3,7 +3,6 @@ import logging
 import os
 import random
 
-import cocotb_test.simulator
 import pytest
 
 import cocotb
