@@ -13,4 +13,4 @@ MODULE   :=  test_axi_lite_slave        # test
 include $(shell cocotb-config --makefiles)/Makefile.sim
 
 clean_all: clean
-	rm -rf *.xml sim_build __pycache__
+	rm -rf *.xml sim_build __pycache__ 
