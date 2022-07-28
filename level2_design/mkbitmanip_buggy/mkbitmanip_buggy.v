@@ -62,7 +62,7 @@ module mkbitmanip_buggy(CLK,
   input  [31 : 0] mav_putvalue_src2;
   input  [31 : 0] mav_putvalue_src3;
   input  EN_mav_putvalue;
-  output [32 : 0] mav_putvalue;
+  output [34 : 0] mav_putvalue;
   output RDY_mav_putvalue;
 
   // value method mv_scopbusy
@@ -70,7 +70,7 @@ module mkbitmanip_buggy(CLK,
   output RDY_mv_scopbusy;
 
   // signals for module outputs
-  wire [32 : 0] mav_putvalue;
+  wire [34 : 0] mav_putvalue;
   wire RDY_mav_putvalue, RDY_mv_scopbusy, mv_scopbusy;
 
   // rule scheduling signals
