@@ -17,11 +17,11 @@ module mux_buggy(sel,inp0, inp1, inp2, inp3, inp4, inp5, inp6, inp7, inp8,
 
   // Based on sel signal value, one of the inp0-inp30 gets assigned to the 
   // output signal
-  always @(sel and inp0 and inp1 and inp2 and inp3 and inp4 and inp5 and inp6 and
-            inp7 and inp8 and inp9 and inp10 and inp11 and inp12 and inp13 and 
-            inp14 and inp15 and inp16 and inp17 and inp18 and inp19 and inp20 and
-            inp21 and inp22 and inp23 and inp24 and inp25 and inp26 and inp27 and 
-            inp28 and inp29 and inp30 )
+  always @(sel or inp0  or inp1 or  inp2 or inp3 or inp4 or inp5 or inp6 or
+            inp7 or inp8 or inp9 or inp10 or inp11 or inp12 or inp13 or 
+            inp14 or inp15 or inp16 or inp17 or inp18 or inp19 or inp20 or
+            inp21 or inp22 or inp23 or inp24 or inp25 or inp26 or inp27 or 
+            inp28 or inp29 or inp30 )
 
   begin
     case(sel)
