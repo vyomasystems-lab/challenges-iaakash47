@@ -4,139 +4,158 @@
 # See LICENSE.cocotb for details
 # See LICENSE.vyoma for details
 
-import os
 import cocotb
-from cocotb.clock import Clock
-from cocotb.triggers import Timer
-from cocotb_bus.drivers.amba import AXI4LiteMaster, AXIProtocolError
-
-CLK_PERIOD_NS = 10
-
-MODULE_PATH = os.path.join(os.path.dirname(__file__), os.pardir, "hdl")
-MODULE_PATH = os.path.abspath(MODULE_PATH)
+from cocotb.triggers import RisingEdge
+from cocotb.result import ReturnValue
 
 
-def setup_dut(dut):
-    cocotb.fork(Clock(dut.clk, CLK_PERIOD_NS, units='ns').start())
+class AXI_Lite_Writer(object):
+    """AXI4-Lite interface writer."""
+
+    def connect(self, dut, clk, bit_width, prefix=None):
+        """Connect the DuT AXI4-Lite interface to this writer.
+        When parameter 'prefix' is not set, DuT AXI4-Lite signals are expected
+        to be named s_axi_awaddr, s_axi_awvalid, ... If 'prefix' is set, DuT
+        AXI4-Lite signals are expected to be named s_axi_<prefix>_awaddr, ...
+        """
+        self.bit_width = bit_width
+        self.access_active = False
+
+        if prefix is None:
+            sig_prefix = "s_axi"
+        else:
+            sig_prefix = "s_axi_%s" % prefix
+
+        self.clk = clk
+        self.awaddr = getattr(dut, "%s_awaddr" % sig_prefix)
+        self.awvalid = getattr(dut, "%s_awvalid" % sig_prefix)
+        self.awready = getattr(dut, "%s_awready" % sig_prefix)
+        self.wdata = getattr(dut, "%s_wdata" % sig_prefix)
+        self.wstrb = getattr(dut, "%s_wstrb" % sig_prefix)
+        self.wvalid = getattr(dut, "%s_wvalid" % sig_prefix)
+        self.wready = getattr(dut, "%s_wready" % sig_prefix)
+        self.bvalid = getattr(dut, "%s_bvalid" % sig_prefix)
+        self.bready = getattr(dut, "%s_bready" % sig_prefix)
+
+    @cocotb.coroutine
+    def rst(self):
+        """Reset signals."""
+        self.awvalid <= 0
+        self.wvalid <= 0
+        self.bready <= 0
+        self.wstrb <= 2**(self.bit_width/8)-1
+        yield RisingEdge(self.clk)
+
+    @cocotb.coroutine
+    def write(self, addr, data):
+        """Write data to the AXI4-Lite interface."""
+        # serialize access
+        while True:
+            if not self.access_active:
+                break
+            yield RisingEdge(self.clk)
+        self.access_active = True
+
+        self.awaddr <= addr
+        self.awvalid <= 1
+
+        self.wdata <= data
+        self.wvalid <= 1
+
+        self.bready <= 1
+
+        while True:
+            yield RisingEdge(self.clk)
+            if int(self.awready) == 1:
+                break
+
+        while True:
+            if int(self.wready) == 1:
+                break
+            yield RisingEdge(self.clk)
+
+        self.awvalid <= 0
+        self.wvalid <= 0
+
+        while True:
+            yield RisingEdge(self.clk)
+            if int(self.bvalid) == 1:
+                break
+
+        self.bready <= 0
+
+        yield RisingEdge(self.clk)
+
+        # release access lock
+        self.access_active = False
 
 
-# Write to address 0 and verify that value got through
-@cocotb.test()
-async def write_address_0(dut):
-    # Reset
-    dut.rst <= 1
-    dut.test_id <= 0
-    axim = AXI4LiteMaster(dut, "AXIML", dut.clk)
-    setup_dut(dut)
-    await Timer(CLK_PERIOD_NS * 10, units='ns')
-    dut.rst <= 0
+class AXI_Lite_Reader(object):
+    """AXI4-Lite interface reader."""
 
-    ADDRESS = 0x00
-    DATA = 0xAB
+    def connect(self, dut, clk, bit_width, prefix=None):
+        """Connect the DuT AXI4-Lite interface to this reader.
+        When parameter 'prefix' is not set, DuT AXI4-Lite signals are expected
+        to be named s_axi_araddr, s_axi_arvalid, ... If 'prefix' is set, DuT
+        AXI4-Lite signals are expected to be named s_axi_<prefix>_araddr, ...
+        """
+        self.bit_width = bit_width
+        self.access_active = False
 
-    await axim.write(ADDRESS, DATA)
-    await Timer(CLK_PERIOD_NS * 10, units='ns')
+        if prefix is None:
+            sig_prefix = "s_axi"
+        else:
+            sig_prefix = "s_axi_%s" % prefix
 
-    value = dut.dut.r_temp_0
-    assert value == DATA, ("Register at address 0x%08X should have been "
-                           "0x%08X but was 0x%08X" % (ADDRESS, DATA, int(value)))
-    dut._log.info("Write 0x%08X to address 0x%08X" % (int(value), ADDRESS))
+        self.clk = clk
+        self.araddr = getattr(dut, "%s_araddr" % sig_prefix)
+        self.arvalid = getattr(dut, "%s_arvalid" % sig_prefix)
+        self.arready = getattr(dut, "%s_arready" % sig_prefix)
+        self.rdata = getattr(dut, "%s_rdata" % sig_prefix)
+        self.rvalid = getattr(dut, "%s_rvalid" % sig_prefix)
+        self.rready = getattr(dut, "%s_rready" % sig_prefix)
 
+    @cocotb.coroutine
+    def rst(self):
+        """Reset signals."""
+        self.arvalid <= 0
+        self.rready <= 0
+        yield RisingEdge(self.clk)
 
-# Read back a value at address 0x04
-@cocotb.test()
-async def read_address_4(dut):
-    # Reset
-    dut.rst <= 1
-    dut.test_id <= 1
-    axim = AXI4LiteMaster(dut, "AXIML", dut.clk)
-    setup_dut(dut)
-    await Timer(CLK_PERIOD_NS * 10, units='ns')
-    dut.rst <= 0
-    await Timer(CLK_PERIOD_NS, units='ns')
-    ADDRESS = 0x04
-    DATA = 0xCD
+    @cocotb.coroutine
+    def read(self, addr):
+        """Read data from the AXI4-Lite interface."""
+        # serialize access
+        while True:
+            if not self.access_active:
+                break
+            yield RisingEdge(self.clk)
+        self.access_active = True
 
-    dut.dut.r_temp_1 <= DATA
-    await Timer(CLK_PERIOD_NS * 10, units='ns')
+        self.araddr <= addr
+        self.arvalid <= 1
 
-    value = await axim.read(ADDRESS)
-    await Timer(CLK_PERIOD_NS * 10, units='ns')
+        self.rready <= 1
 
-    assert value == DATA, ("Register at address 0x%08X should have been "
-                           "0x%08X but was 0x%08X" % (ADDRESS, DATA, int(value)))
-    dut._log.info("Read: 0x%08X From Address: 0x%08X" % (int(value), ADDRESS))
+        while True:
+            yield RisingEdge(self.clk)
+            if int(self.arready) == 1:
+                break
 
+        self.arvalid <= 0
 
-@cocotb.test()
-async def write_and_read(dut):
+        while True:
+            yield RisingEdge(self.clk)
+            if int(self.rvalid) == 1:
+                break
 
-    # Reset
-    dut.rst <= 1
-    dut.test_id <= 2
-    axim = AXI4LiteMaster(dut, "AXIML", dut.clk)
-    setup_dut(dut)
-    await Timer(CLK_PERIOD_NS * 10, units='ns')
-    dut.rst <= 0
+        self.rready <= 0
 
-    ADDRESS = 0x00
-    DATA = 0xAB
+        data = int(self.rdata)
 
-    # Write to the register
-    await axim.write(ADDRESS, DATA)
-    await Timer(CLK_PERIOD_NS * 10, units='ns')
+        yield RisingEdge(self.clk)
 
-    # Read back the value
-    value = await axim.read(ADDRESS)
-    await Timer(CLK_PERIOD_NS * 10, units='ns')
+        # release access lock
+        self.access_active = False
 
-    value = dut.dut.r_temp_0
-    assert value == DATA, ("Register at address 0x%08X should have been "
-                           "0x%08X but was 0x%08X" % (ADDRESS, DATA, int(value)))
-    dut._log.info("Write 0x%08X to address 0x%08X" % (int(value), ADDRESS))
-
-
-@cocotb.test()
-async def write_fail(dut):
-    # Reset
-    dut.rst <= 1
-    dut.test_id <= 3
-    axim = AXI4LiteMaster(dut, "AXIML", dut.clk)
-    setup_dut(dut)
-    await Timer(CLK_PERIOD_NS * 10, units='ns')
-    dut.rst <= 0
-
-    ADDRESS = 0x08
-    DATA = 0xAB
-
-    try:
-        await axim.write(ADDRESS, DATA)
-        await Timer(CLK_PERIOD_NS * 10, units='ns')
-    except AXIProtocolError as e:
-        print("Exception: %s" % str(e))
-        dut._log.info("Bus successfully raised an error")
-    else:
-        assert False, "AXI bus should have raised an error when writing to an invalid address"
-
-
-@cocotb.test()
-async def read_fail(dut):
-    # Reset
-    dut.rst <= 1
-    dut.test_id <= 4
-    axim = AXI4LiteMaster(dut, "AXIML", dut.clk)
-    setup_dut(dut)
-    await Timer(CLK_PERIOD_NS * 10, units='ns')
-    dut.rst <= 0
-
-    ADDRESS = 0x08
-    DATA = 0xAB
-
-    try:
-        await axim.read(ADDRESS, DATA)
-        await Timer(CLK_PERIOD_NS * 10, units='ns')
-    except AXIProtocolError as e:
-        print("Exception: %s" % str(e))
-        dut._log.info("Bus Successfully Raised an Error")
-    else:
-        assert False, "AXI bus should have raised an error when reading from an invalid address"
+        raise ReturnValue(data)
