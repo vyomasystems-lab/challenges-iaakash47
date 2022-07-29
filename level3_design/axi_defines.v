@@ -1,6 +1,6 @@
 `timescale 1ps / 1ps
 
-module axi_lite_demo #(
+module axi_defines #(
   parameter ADDR_WIDTH          = 32,
   parameter DATA_WIDTH          = 32,
   parameter STROBE_WIDTH        = (DATA_WIDTH / 8)
