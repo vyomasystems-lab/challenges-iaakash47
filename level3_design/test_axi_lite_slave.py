@@ -1,9 +1,3 @@
-# See LICENSE.cocotb for details
-# See LICENSE.vyoma for details
-
-# See LICENSE.cocotb for details
-# See LICENSE.vyoma for details
-
 import cocotb
 from cocotb.triggers import RisingEdge
 from cocotb.result import ReturnValue
