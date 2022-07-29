@@ -132,10 +132,10 @@ always @ (posedge clk) begin
           o_reg_in_rdy    <=  0;
           o_bvalid        <=  1;
           if (i_reg_invalid_addr) begin
-            o_bresp       <=  `AXI_RESP_DECERR;
+            o_bresp <=  `AXI_RESP_DECERR;
           end
           else begin
-            o_bresp       <=  `AXI_RESP_OKAY;
+            o_bresp <=  `AXI_RESP_OKAY;
           end
         end
       end
@@ -153,10 +153,10 @@ always @ (posedge clk) begin
           //The data in i_reg_out_data should be valid now
           o_rdata       <=  i_reg_out_data;
           if (i_reg_invalid_addr) begin
-            o_rresp     <=  `AXI_RESP_DECERR;
+            o_rresp <=  `AXI_RESP_DECERR;
           end
           else begin
-            o_rresp     <=  `AXI_RESP_OKAY;
+            o_rresp <=  `AXI_RESP_OKAY;
           end
           o_rvalid      <=  1;
           state         <=  SEND_READ_DATA;
