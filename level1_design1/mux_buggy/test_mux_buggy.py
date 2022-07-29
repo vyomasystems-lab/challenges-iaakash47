@@ -9,8 +9,6 @@ async def test_mux(dut):
     """Test for mux2"""
 
     cocotb.log.info('##### CTB: Develop your test here ########')
-    inp00=1
-    inp01=0
     inp1=0
     inp2=1
     inp3=0
