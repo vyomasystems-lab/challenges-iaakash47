@@ -4,10 +4,10 @@ TOPLEVEL_LANG ?= verilog
 
 PWD=$(shell pwd)
 
-VERILOG_SOURCES = $(PWD)/seq_detect_1011_buggy.v
+VERILOG_SOURCES = $(PWD)/seq_detect_1011_fix.v
 
-TOPLEVEL := seq_detect_1011_buggy          # design
-MODULE   := test_seq_detect_1011_buggy     # test
+TOPLEVEL := seq_detect_1011_fix          # design
+MODULE   := test_seq_detect_1011_fix     # test
 
 include $(shell cocotb-config --makefiles)/Makefile.sim
 
