@@ -3,14 +3,10 @@
 import cocotb
 from cocotb.triggers import Timer
 
-@cocotb.test()
-async def test_mux(dut):
-    """Test for mux2"""
 
-    cocotb.log.info('##### CTB: Develop your test here ########')
-    @cocotb.test()
+@cocotb.test()
     
-    async def mux_basic_test(dut):
+async def mux_basic_test(dut):
     """Test for INP30"""
 
     INP30 = 3    

@@ -1,6 +1,6 @@
 // See LICENSE.vyoma for more details
-// Verilog module for Sequence detection: 1111
-module seq_detect_1111_buggy(seq_seen, inp_bit, reset, clk);
+// Verilog module for Sequence detection: 1011
+module seq_detect_1011_buggy(seq_seen, inp_bit, reset, clk);
 
   output seq_seen;
   input inp_bit;
@@ -9,15 +9,15 @@ module seq_detect_1111_buggy(seq_seen, inp_bit, reset, clk);
 
   parameter IDLE = 0,
             SEQ_1 = 1, 
-            SEQ_11 = 2,
-            SEQ_111 = 3,
-            SEQ_1111 = 4;
+            SEQ_10 = 2,
+            SEQ_101 = 3,
+            SEQ_1011 = 4;
 
   reg [2:0] current_state, next_state;
 
-  // if the current state of the FSM has the sequence 1111, then the output is
+  // if the current state of the FSM has the sequence 1011, then the output is
   // high
-  assign seq_seen = current_state == SEQ_1111 ? 1 : 0;
+  assign seq_seen = current_state == SEQ_1011 ? 1 : 0;
 
   // state transition
   always @(posedge clk)
@@ -48,19 +48,19 @@ module seq_detect_1111_buggy(seq_seen, inp_bit, reset, clk);
         if(inp_bit == 1)
           next_state = IDLE;
         else
-          next_state = SEQ_11;
+          next_state = SEQ_10;
       end
       SEQ_10:
       begin
         if(inp_bit == 1)
-          next_state = SEQ_111;
+          next_state = SEQ_101;
         else
           next_state = IDLE;
       end
       SEQ_101:
       begin
         if(inp_bit == 1)
-          next_state = SEQ_1111;
+          next_state = SEQ_1011;
         else
           next_state = IDLE;
       end
