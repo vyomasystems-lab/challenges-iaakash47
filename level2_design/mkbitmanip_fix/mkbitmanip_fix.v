@@ -40,7 +40,7 @@
   `define BSV_RESET_EDGE negedge
 `endif
 
-module mkbitmanip_buggy(CLK,
+module mkbitmanip_fix(CLK,
 		  RST_N,
 
 		  mav_putvalue_instr,

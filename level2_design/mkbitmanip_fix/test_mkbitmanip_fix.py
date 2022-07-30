@@ -9,7 +9,7 @@ from cocotb.triggers import Timer, RisingEdge
 from cocotb.result import TestFailure
 from cocotb.clock import Clock
 
-from model_mkbitmanip_buggy import *
+from model_mkbitmanip_fix import *
 
 # Clock Generation
 @cocotb.coroutine
