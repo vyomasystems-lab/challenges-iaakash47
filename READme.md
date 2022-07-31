@@ -281,9 +281,9 @@ Output mismatches for the above inputs proving that there is a design bug in the
 
 
 
-
-![IMG_20220731_211409](https://user-images.githubusercontent.com/88897605/182035119-5654bc3f-84d1-4b95-a34c-900196373a99.png)
 ![IMG_20220731_211247](https://user-images.githubusercontent.com/88897605/182035121-f5a026b8-bdf4-4f8a-b66a-c32273f3ebf6.png)
+![IMG_20220731_211409](https://user-images.githubusercontent.com/88897605/182035119-5654bc3f-84d1-4b95-a34c-900196373a99.png)
+
 
 ### Level3 Design Bug
 
@@ -339,6 +339,8 @@ reg [DATA_WIDTH-1:0] mem[(2**VALID_ADDR_WIDTH)-1:0];
 wire [VALID_ADDR_WIDTH-1:0] s_axil_awaddr_valid = s_axil_awaddr >> (ADDR_WIDTH - VALID_ADDR_WIDTH);     ====> BUG Resolved 
 wire [VALID_ADDR_WIDTH-1:0] s_axil_araddr_valid = s_axil_araddr >> (ADDR_WIDTH - VALID_ADDR_WIDTH);     ====> BUG Resolved 
 ```
+The updated design is checked in as axi_lite_slave_buggy.v
+
 #### Level3 Design Bug Fix
 
 ![IMG_20220731_211324](https://user-images.githubusercontent.com/88897605/182035401-0b94c71a-196f-4315-8ff0-5c6147b532c4.png)
