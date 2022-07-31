@@ -343,6 +343,12 @@ wire [VALID_ADDR_WIDTH-1:0] s_axil_araddr_valid = s_axil_araddr >> (ADDR_WIDTH -
 
 ![IMG_20220731_211324](https://user-images.githubusercontent.com/88897605/182035401-0b94c71a-196f-4315-8ff0-5c6147b532c4.png)
 
+# AXI Lite Slave  Reference Waveform
+![c1fe3809e14e48fafe99944ac3b6c04c](https://user-images.githubusercontent.com/88897605/182039247-bd763630-0f91-457f-968e-ec5f851e6956.png)
+
+
+# AXI Lite Slave Waveform
+![IMG_20220731_232459](https://user-images.githubusercontent.com/88897605/182039192-abf5d4a3-b3c9-44bc-b4f1-f28ee5f72d8a.jpg)
 
 # Contributor
 Aakash K</br>
