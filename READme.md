@@ -344,6 +344,14 @@ wire [VALID_ADDR_WIDTH-1:0] s_axil_araddr_valid = s_axil_araddr >> (ADDR_WIDTH -
 ![IMG_20220731_211324](https://user-images.githubusercontent.com/88897605/182035401-0b94c71a-196f-4315-8ff0-5c6147b532c4.png)
 
 
+# Contributor
+Aakash K</br>
+Contact:iaakashkrish@gmail.com</br>
+
+# Acknowledgements
+
+- [Kunal Ghosh](https://github.com/kunalg123), Co-founder, VSD Corp. Pvt. Ltd - kunalpghosh@gmail.com
+- [Lavanya J](https://vyomasystems.com) Vyomasystems- lanvanya@vyomasystems.com
 
 
 
